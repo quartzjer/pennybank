@@ -3,7 +3,7 @@
 scriptPubKey: OP_SHA256 <checkHash> OP_EQUALVERIFY OP_DUP OP_HASH160 <pubkeyHash> OP_EQUALVERIFY OP_CHECKSIG
 scriptSig: <sig> <pubkey> <varHash>
 ```
-* Becomes a valid P2SH after 0.10
+* Becomes a valid P2SH [after 0.10](https://github.com/bitcoin/bitcoin/pull/4365)
 * allows any secret to be exchanged between sender/recipient after the transaction
 * allows secret to be based on a proof of work
 * simpler alternative to [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party)
