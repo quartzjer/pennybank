@@ -6,6 +6,7 @@ scriptSig: <sig> <pubkey> <varHash>
 * Becomes a valid P2SH after 0.10
 * allows any secret to be exchanged between sender/recipient after the transaction
 * allows secret to be based on a proof of work
+* simpler alternative to [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party)
 
 ## micro-transactions
 
