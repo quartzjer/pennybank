@@ -1,8 +1,10 @@
-# Trustless Micro-Transactions
+# Trustless Microtransactions
 
 ## Abstract
 
-This defines a simple process for two parties to safely exchange miniscule amounts of bitcoin without requiring trust in the other party, timelocks, or creating many fee-burdened dust transactions.
+The architecture of the bitcoin blockchain does not support microtransactions without fees in order to reward the network for maintaining the ledger, small transactions are simply not economically valuable enough to maintain in a distributed blockchain.
+
+This defines a simple process for two parties to safely exchange miniscule amounts of bitcoin without requiring trust in the other party, timelocks, or creating many fee-burdened dust transactions.  It shows how to create a side-ledger to use for exchanging the microtransactions based on the same proof-of-work mining foundation, and only records the results in the network.
 
 ## Motivation
 
