@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This defines a simple process for two parties to safely exchange miniscule amounts of bitcoin without requiring trust in the other party, timelocks, refunds, or creating many fee-burdened dust transactions.
+This defines a simple process for two parties to safely exchange miniscule amounts of bitcoin without requiring trust in the other party, timelocks, or creating many fee-burdened dust transactions.
 
 ## Motivation
 
@@ -30,11 +30,24 @@ In order to lock a P2H it can be combined with a standard [P2PKH](https://en.bit
 
 ### micro-transactions
 
-The value of every bitcoin is backed by the current [difficulty](https://en.bitcoin.it/wiki/Difficulty), which reduces to a number of hashes-per-satoshi ([example formula](http://bitcoin.stackexchange.com/questions/12013/how-many-hashes-create-one-bitcoin/12030#12030).  Currently, the difficulty of [40007470271.271](https://bitcoinwisdom.com/bitcoin/difficulty) results in  
-* alice gets the current blockchain difficulty and generates lots of p2hh's with secrets of the current difficulty of the btc in them
-* alice puts them all in a "budget" tx to bob's pubkey
-* bob verifies and does same back in reverse, is “change” tx
-* alice or bob can claim either tx anytime, but will cost high fees
-* either can brute force any p2hh but claiming them may impose more fees, and "costs" the same to brute force (no incentive)
-* each micro-tx involves bob and alice randomly picking a p2hh in the txns and exchanging the secret, verifying its difficulty matches (ending if not)
-* anytime, either can send/require a “re-balance” of original tx with the current value unlocked in one output and fewer p2hh's, minimizes fees for both 
+#### proof of work difficulty
+
+The value of every bitcoin is backed by the current [difficulty](https://en.bitcoin.it/wiki/Difficulty), which reduces to a number of hashes-per-satoshi ([example formula](http://bitcoin.stackexchange.com/questions/12013/how-many-hashes-create-one-bitcoin/12030#12030).  Currently, the difficulty of [40007470271.271](https://bitcoinwisdom.com/bitcoin/difficulty) results in approximately [65 hashes](https://www.google.com/#q=((270%2C591%2C326+*+60+*+10)+%2F+25)+%2F+100%2C000%2C000) to back the value of one satoshi.  A proof of work for one satoshi would then require between 6 and 7 bits, where a random bitstring of that size when hashed, would require an average of 65 hashes of the same size bitstring to find a match.
+
+#### "budget" transaction
+
+> documentation here is a higher level work in progress and needs to be synchronized with the micropayment channel patterns
+
+When Alice wants to perform a microtransaction with Bob, they begin by creating a budget transaction that is high enough to avoid or minimize transaction fees, and then calculate the size of each microtransaction required and generate a P2HH for each one with the correct number of bits for the current difficulty.  The budget transaction contains all of the individual P2HH scripts and is generally very large and would be unfeasible to use as-is due to fees, but provides a guarantee to Bob that the value is budgeted.
+
+Bob needs to verify the difficulty of the contained P2HH's, so picks one at random and challenges Alice to unlock it by sending the secret and validating that the bits in the secret match the current difficulty for each microtransaction (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob is confident that the value is contained, they generate and send a budget transaction back to Alice that contains a direct P2PKH refund of most of the value, and the number of P2HH microtransactions for the value spent so far.
+
+As Alice and Bob exchange the actual small asset/values represented by a microtransaction, Bob continues to request a P2HH and Alice provides the secret.  At any point either side may request a re-balance, exchanging updated budget transactions with larger/smaller direct P2PKH's.
+
+Need to expand yet on these points:
+
+* provides a way to prove the budget is available and each P2HH unlocks that amount of value
+* in the beginning the incentive is to cooperate since transaction fees would be too high to claim the small values
+* since the brute force of a proof-of-work P2HH requires as many hashes as mining, there is no incentive to crack them
+* if either side abandons the budget transaction, it can be held onto as an asset that will still increase in value
+* the budget transactions can be easily combined with multi-key ones to add arbitration, locked to sidechains, include OP_RETURNs, etc
