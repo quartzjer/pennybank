@@ -36,11 +36,11 @@ In order to lock a P2H it can be combined with a standard [P2PKH](https://en.bit
 
 The value of every bitcoin is backed by the current [difficulty](https://en.bitcoin.it/wiki/Difficulty), which reduces to a number of hashes-per-satoshi ([example formula](http://bitcoin.stackexchange.com/questions/12013/how-many-hashes-create-one-bitcoin/12030#12030).  Currently, the difficulty of [40007470271.271](https://bitcoinwisdom.com/bitcoin/difficulty) results in approximately [65 hashes](https://www.google.com/#q=((270%2C591%2C326+*+60+*+10)+%2F+25)+%2F+100%2C000%2C000) to back the value of one satoshi.  A proof of work for one satoshi would then require between 6 and 7 bits, where a random bitstring of that size when hashed, would require an average of 65 hashes of the same size bitstring to find a match.
 
-#### "budget" transaction
+#### Penny Bank - "budget" transaction
 
 > documentation here is a higher level work in progress and needs to be synchronized with the micropayment channel patterns
 
-When Alice wants to perform a microtransaction with Bob, they begin by creating a budget transaction that is high enough to avoid or minimize transaction fees, and then calculate the size of each microtransaction required and generate a P2HH for each one with the correct number of bits for the current difficulty.  The budget transaction contains all of the individual P2HH scripts and is generally very large and would be unfeasible to use as-is due to fees, but provides a guarantee to Bob that the value is budgeted.
+When Alice wants to perform a microtransaction with Bob, they begin by creating a penny bank, a budget transaction that is high enough to avoid or minimize transaction fees, and then calculate the size of each microtransaction required and generate a P2HH for each one with the correct number of bits for the current difficulty.  The budget transaction contains all of the individual P2HH scripts (the pennies in the bank) and is generally very large and would be unfeasible to use as-is due to fees, but provides a guarantee to Bob that the value is budgeted.
 
 Bob needs to verify the difficulty of the contained P2HH's, so picks one at random and challenges Alice to unlock it by sending the secret and validating that the bits in the secret match the current difficulty for each microtransaction (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob is confident that the value is contained, they generate and send a budget transaction back to Alice that contains a direct P2PKH refund of most of the value, and the number of P2HH microtransactions for the value spent so far.
 
