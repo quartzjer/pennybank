@@ -1,4 +1,4 @@
-# Bitcoin  Pennybank - Distributed Microtransactions
+# Bitcoin  Penny Banks - Distributed Microtransactions
 
 ## Abstract
 
