@@ -1,0 +1,25 @@
+{
+  "name": "pennybank",
+  "version": "0.0.1",
+  "description": "Penny Bank - Distributed Bitcoin Microtransactions",
+  "dependencies": {
+    "bcoin": "^0.14.4",
+    "bitcoinjs-lib": "^1.4.2",
+    "helloblock-js": "^0.2.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quartzjer/pennybank.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "microtransaction",
+    "penny bank"
+  ],
+  "author": "Jeremie Miller <jeremie@jabber.org>",
+  "license": "Public Domain",
+  "bugs": {
+    "url": "https://github.com/quartzjer/pennybank/issues"
+  },
+  "homepage": "https://github.com/quartzjer/pennybank"
+}
