@@ -16,7 +16,7 @@ The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Exampl
 
 In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges.  This larger transaction includes a proof-of-work for the value it contains and acts as the "bank" that is only ever broadcast to the network once to minimize the overhead fees.  The individual micro-transactions are private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work in the bank transaction.
 
-### Pay-to-Hash (P2H*)
+### Pay-to-Hash (P2H1, P2H2, ...)
 
 A `P2H*` is only accepted in a transaction when used as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) from another transaction in version [0.10 or later](https://github.com/bitcoin/bitcoin/pull/4365).
 
@@ -32,7 +32,7 @@ A `P2H*` one or more sequential `OP_HASH256 <checkHash> OP_EQUALVERIFY` sectons 
 
 ### Penny Banks (PB)
 
-A Penny Pank (`PB`) is created by generating a series of small proof-of-work challenges that divide an amount of bitcoin into smaller values to be individually exchanged.  Each challenge in the set has a secret bitstring with a size calculated such that the value it represents matches [current block difficulty](#difficulty) in number of hashes required to generate a given SHA-256 hash. The resulting series of hashes collectively represent a larger bitcoin value as a set of smaller proof-of-works equal to the bitcoin itself.
+A Penny Bank (abbreviated `PB`) is created by generating a series of small proof-of-work challenges that divide an amount of bitcoin into smaller values to be individually exchanged.  Each challenge in the series has a secret bitstring with a size calculated such that the value it represents matches [current block difficulty](#difficulty) in number of hashes required to generate a given SHA-256 hash. The resulting series of hashes collectively represent a larger bitcoin value as a set of smaller proof-of-works equal to the bitcoin itself.
 
 For two parties to mutually agree on a `PB` they must each provide and verify a set of challeges that equal in total difficulty, and together these two sets form the foundation for a `PB` transaction
 
