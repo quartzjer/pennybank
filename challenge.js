@@ -1,4 +1,4 @@
-// this creates a series of proof of work challenge sets
+// this creates/verifies sets of proof of work challenges
 
 var crypto = require('crypto');
 
@@ -24,10 +24,10 @@ exports.Challenge = function(quantity, difficulty, sets)
 
     // turn it into a sorted list of just the hashes to share
     var hashes = Object.keys(secrets).sort();
-    // concat the sorted secrets
-    var csecret = Buffer.concat(hashes.map(function(hash){ return secrets[hash]; }));
+    // concat the hashes to generate the hash of the whole set
+    var chashes = Buffer.concat(hashes.map(function(hash){ return new Buffer(hash, 'hex'); }));
     // generate the hash to identify the whole thing
-    var chash = crypto.createHash('sha256').update(csecret).digest('hex');
+    var chash = crypto.createHash('sha256').update(chashes).digest('hex');
     
     // one challenge set
     ret.challenges[chash] = hashes;
@@ -35,4 +35,9 @@ exports.Challenge = function(quantity, difficulty, sets)
   }
   
   return ret;
+}
+
+exports.Verify = function(hash, hashes, secrets, difficulty)
+{
+  // check the secrets/hashes
 }
