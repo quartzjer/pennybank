@@ -40,5 +40,29 @@ describe('challenge', function(){
 
   });
 
+  it('should verify a set', function(){
+    var sets = libchallenge.Challenge(10,16,1);
+    expect(sets).to.be.an('object');
+    var cset = Object.keys(sets.challenges)[0];
+    
+    expect(libchallenge.Verify(cset, sets.challenges[cset], sets.secrets[cset], 16)).to.be.true;
+  });
+
+  it('should not verify a bad challenge hash', function(){
+    var sets = libchallenge.Challenge(10,16,1);
+    expect(sets).to.be.an('object');
+    var cset = Object.keys(sets.challenges)[0];
+    sets.challenges[cset][5] = "abad";
+    expect(libchallenge.Verify(cset, sets.challenges[cset], sets.secrets[cset], 16)).to.be.false;
+  });
+
+  it('should not verify a bad secret', function(){
+    var sets = libchallenge.Challenge(10,16,1);
+    expect(sets).to.be.an('object');
+    var cset = Object.keys(sets.challenges)[0];
+    sets.secrets[cset][sets.challenges[cset][5]] = crypto.randomBytes(2);
+    expect(libchallenge.Verify(cset, sets.challenges[cset], sets.secrets[cset], 16)).to.be.false;
+  });
+
 
 });

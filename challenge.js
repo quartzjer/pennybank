@@ -9,7 +9,7 @@ exports.Challenge = function(quantity, difficulty, sets)
   ret.secrets = {};
 
   // TODO, use exact bits
-  ret.d = Math.ceil(ret.d/8);
+  var dbytes = Math.ceil(ret.d/8);
 
   for(var i = 0; i < sets; i++)
   {
@@ -17,7 +17,7 @@ exports.Challenge = function(quantity, difficulty, sets)
     var secrets = {};
     for(var j = 0; j < quantity; j++)
     {
-      var secret = crypto.randomBytes(ret.d);
+      var secret = crypto.randomBytes(dbytes);
       var hash = crypto.createHash('sha256').update(secret).digest('hex');
       secrets[hash] = secret;
     }
@@ -39,5 +39,20 @@ exports.Challenge = function(quantity, difficulty, sets)
 
 exports.Verify = function(hash, hashes, secrets, difficulty)
 {
-  // check the secrets/hashes
+  // check the hash/hashes first
+  var chashes = Buffer.concat(hashes.map(function(hash){ return new Buffer(hash, 'hex'); }));
+  if(hash != crypto.createHash('sha256').update(chashes).digest('hex')) return false;
+  
+  // TODO, use exact bits
+  var dbytes = Math.ceil(difficulty/8);
+
+  // check the secrets->hashes and difficulty
+  for(var i = 0; i < hashes.length; i++)
+  {
+    if(hashes[i] != crypto.createHash('sha256').update(secrets[hashes[i]]).digest('hex')) return false;
+    if(secrets[hashes[i]].length != dbytes) return false;
+  }
+  
+  // all good
+  return true;
 }
