@@ -7,6 +7,13 @@
     "bitcoinjs-lib": "^1.4.2",
     "helloblock-js": "^0.2.5"
   },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*"
+  },
+  "scripts": {
+      "test": "make test"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/quartzjer/pennybank.git"
