@@ -16,11 +16,11 @@ There is also some similarities to the [sidechains paper](http://www.blockstream
 
 ## Specification
 
-In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges.  This larger transaction includes a proof-of-work for the value it contains and acts as the "bank" that is only ever broadcast to the network once to minimize the overhead fees.  The individual micro-transactions are private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work in the bank transaction.
+In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges with a verifiable proof-of-work.  This larger transaction is private to both parties while transacting and acts as the "bank", it is only ever broadcast to the network at the end or whenever either party is finished.  The individual micro-transactions are always private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work referenced in the bank transaction.
 
 ### Pay-to-Hash (P2H1, P2H2, ...)
 
-A `P2H*` is only accepted in a transaction when used as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) from another transaction in version [0.10 or later](https://github.com/bitcoin/bitcoin/pull/4365).
+A `P2H*` is only accepted in a transaction when used as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) from another transaction in version [0.10 or later](https://github.com/bitcoin/bitcoin/pull/4365). They are never valid as an output, only as an input to claim a P2SH output.
 
 The template looks like:
 ```
