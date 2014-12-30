@@ -8,7 +8,7 @@ This outlines a simple technique to turn a larger bitcoin value into miniscule a
 
 ## Motivation
 
-With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/bitcoin/bitcoin/pull/4365), new types of scripts can be used in transactions and will accepted into the blockchain by updated miners.  While many opcodes are still [diabled](https://en.bitcoin.it/wiki/Script#Words) to minimize the risk of a hard fork, only an `[OP_HASH256](https://en.bitcoin.it/wiki/Script#Crypto)` is required to enable proof-of-work based micro-transactions.
+With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/bitcoin/bitcoin/pull/4365), new types of scripts can be used in transactions and will accepted into the blockchain by updated miners.  While many opcodes are still [disabled](https://en.bitcoin.it/wiki/Script#Words) to minimize the risk of a hard fork, only an `[OP_HASH256](https://en.bitcoin.it/wiki/Script#Crypto)` is required to enable proof-of-work based micro-transactions.
 
 The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party) technique works within the current limits and has had some early adoption, but it can now be significantly simplified and aligned with the core value structure of the blockchain, proof-of-work based hashing. The proposed [zero-knowledge contingent payment](https://en.bitcoin.it/wiki/Zero_Knowledge_Contingent_Payment) is also a good foundation, but instead of an external protocol the contingency function is included here as part of the transaction itself.
 
@@ -25,16 +25,16 @@ The template looks like:
 scriptPubKey: OP_HASH256 <checkHash> OP_EQUALVERIFY
 scriptSig: <data>
 ```
-This allows anyone with the correct `<data>` to spend it, you may recognize the pattern from the [transaction puzzle example](https://en.bitcoin.it/wiki/Script#Transaction_puzzle).  These types of transactions can now be commonly used to anonymously exchange value based on any simple shared or derived secret, as well as act as the foundation for a proof-of-work when the size of the `data` is fixed/known or can be drived from an agreed upon proof-of-work chain.
+This allows anyone with the correct `<data>` to spend it, you may recognize the pattern from the [transaction puzzle example](https://en.bitcoin.it/wiki/Script#Transaction_puzzle).  These types of transactions can now be commonly used to anonymously exchange value based on any simple shared or derived secret, as well as act as the foundation for a proof-of-work when the size of the `data` is fixed/known or can be derived from an agreed upon proof-of-work chain.
 
-A `P2H*` one or more sequential `OP_HASH256 <checkHash> OP_EQUALVERIFY` sectons to validate each individual `<data>` input, allowing single or multi-party secret sharing. The shorthand for this type of script is numbered based on the quantity of `<checkHash>` included, one is a `P2H1` and two a `P2H2`, etc.
+A `P2H*` one or more sequential `OP_HASH256 <checkHash> OP_EQUALVERIFY` sections to validate each individual `<data>` input, allowing single or multi-party secret sharing. The shorthand for this type of script is numbered based on the quantity of `<checkHash>` included, one is a `P2H1` and two a `P2H2`, etc.
 
 
 ### Penny Banks (PB)
 
 A Penny Bank (abbreviated `PB`) is created by generating a series of small proof-of-work challenges that divide an amount of bitcoin into smaller values to be individually exchanged.  Each challenge in the series has a secret bitstring with a size calculated such that the value it represents matches [current block difficulty](#difficulty) in number of hashes required to generate a given SHA-256 hash. The resulting series of hashes collectively represent a larger bitcoin value as a set of smaller proof-of-works equal to the bitcoin itself.
 
-For two parties to mutually agree on a `PB` they must each provide and verify a set of challeges that equal in total difficulty, and together these two sets form the foundation for a `PB` transaction
+For two parties to mutually agree on a `PB` they must each provide and verify a set of challenges that equal in total difficulty, and together these two sets form the foundation for a `PB` transaction
 
 This transaction uses a `P2H2` as one of the `P2SH` outputs for the main balance available in the `PB`, and a `P2PKH` for each of the parties to carry forward the balance not associated with the bank.  Like [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party), this transaction is kept private between the two parties and only used as a last resort if either party misbehaves.  The un-broadcast transaction can then be updated and "re-balanced" over time as value is exchanged, adjusting the amounts of the outputs and generating new signatures.
 
@@ -60,7 +60,7 @@ Once both of them exchange their signatures of the agreed upon `PB`, then Alice 
 
 As Alice and Bob exchange the actual small asset/values in a microtransaction they can also exchange the secret bitstrings from their sets for the correct value and validate it. At regular intervals either side may request a re-balance, exchanging and signing an updated `PB` with the balances of the `P2H2` and `P2PKH` outputs adjusted accordingly.
 
-This model incentivises both parties to cooperate to mutually unlock the value over time.  The bitcoin in the bank is locked and inaccessible to either side without cooperation or hashing, and since the difficulty is identical to mining the main blockchain it is of no current value to withold or abandon the exchange.
+This model incentivises both parties to cooperate to mutually unlock the value over time.  The bitcoin in the bank is locked and inaccessible to either side without cooperation or hashing, and since the difficulty is identical to mining the main blockchain it is of no current value to withhold or abandon the exchange.
 
 If either party misbehaves or stops providing value, the other has a valid `PB` to broadcast to permanently freeze the exchange at that point.  If the source set of secret bitstrings is stored by both, at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen `P2H2` as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2H2` value, but this process may offer little reward given the value of hashing for the main blockchain, the frozen `PB` transactions act as a long term mutual debt/asset for both parties, owned by neither.
 
@@ -74,7 +74,7 @@ Summary steps:
 * Bob->Alice return signed PB
 * Alice broadcasts funding of PB
 * Bob verifies funding, value is now locked in the PB
-* over time PB is re-balacnced with new signatures, either can broadcast it and freeze it at that point locking the balances in place
+* over time PB is re-balanced with new signatures, either can broadcast it and freeze it at that point locking the balances in place
 
 
 #### Penny Bankers
@@ -85,7 +85,7 @@ Anyone can create a pair of Penny Banks with one or more well-known "Penny Banke
 
 When initiating an exchange with a third party, the sender must share the current `PB` set of hashes to act as the "account" and the Banker the `PB` is with so that the third party can validate that it is valid and currently funded.
 
-The recipient must also have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each secret bitstring received as a microtransaction can then be validated immediately locally as part of the `PB` and of the right difficulty, and should then be exchanged with their Banker into their private receiving `PB`.  Exchanging these offline is possible but runs the risk of the individual secret bitstring becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them. 
+The recipient must also have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each secret bitstring received as a microtransaction can then be validated immediately locally as part of the `PB` and of the right difficulty, and should then be exchanged with their Banker into their private receiving `PB`.  Exchanging these offline is possible but runs the risk of the individual secret bitstring becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them.
 
 Using multiple Bankers who independently clear with each other helps minimize the visibility of the actual parties performing the microtransactions.
 
