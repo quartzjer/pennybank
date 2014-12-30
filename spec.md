@@ -27,7 +27,7 @@ scriptSig: <data>
 ```
 This allows anyone with the correct `<data>` to spend it, you may recognize the pattern from the [transaction puzzle example](https://en.bitcoin.it/wiki/Script#Transaction_puzzle).  These types of transactions can now be commonly used to anonymously exchange value based on any simple shared or derived secret, as well as act as the foundation for a proof-of-work when the size of the `data` is fixed/known or can be derived from an agreed upon proof-of-work chain.
 
-A `P2H*` one or more sequential `OP_HASH256 <checkHash> OP_EQUALVERIFY` sections to validate each individual `<data>` input, allowing single or multi-party secret sharing. The shorthand for this type of script is numbered based on the quantity of `<checkHash>` included, one is a `P2H1` and two a `P2H2`, etc.
+A `P2H*` contains one or more sequential `OP_HASH256 <checkHash> OP_EQUALVERIFY` sections to validate each individual `<data>` input, allowing single or multi-party secret sharing. The shorthand for this type of script is numbered based on the quantity of `<checkHash>` included, one is a `P2H1` and two a `P2H2`, etc.
 
 
 ### Penny Banks (PB)
