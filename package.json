@@ -5,6 +5,7 @@
   "dependencies": {
     "bcoin": "^0.14.4",
     "bitcoinjs-lib": "^1.4.2",
+    "bitcore": "^0.8.5",
     "helloblock-js": "^0.2.5"
   },
   "devDependencies": {
@@ -12,7 +13,7 @@
     "mocha": "*"
   },
   "scripts": {
-      "test": "make test"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
