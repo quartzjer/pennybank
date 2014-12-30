@@ -12,6 +12,8 @@ With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/b
 
 The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party) technique works within the current limits and has had some early adoption, but it can now be significantly simplified and aligned with the core value structure of the blockchain, proof-of-work based hashing. The proposed [zero-knowledge contingent payment](https://en.bitcoin.it/wiki/Zero_Knowledge_Contingent_Payment) is also a good foundation, but instead of an external protocol the contingency function is included here as part of the transaction itself.
 
+There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that the proposal here also has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full side blockchain.
+
 ## Specification
 
 In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges.  This larger transaction includes a proof-of-work for the value it contains and acts as the "bank" that is only ever broadcast to the network once to minimize the overhead fees.  The individual micro-transactions are private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work in the bank transaction.
