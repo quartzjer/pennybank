@@ -18,7 +18,7 @@ There is also some similarities to the [sidechains paper](http://www.blockstream
 
 In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges with a verifiable proof-of-work.  This larger transaction is private to both parties while transacting and acts as the "bank", it is only ever broadcast to the network at the end or whenever either party is finished.  The individual micro-transactions are always private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work referenced in the bank transaction.
 
-### P2SH Conditional Multisig
+### P2SH Conditional Multisig (P2CM)
 
 > A *Conditional Multisig* script is only accepted as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) in version [0.10 or later](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses).
 
@@ -27,17 +27,19 @@ The conditional multisig script template used here is:
 OP_HASH160 <A hash> OP_EQUALVERIFY OP_HASH160 <B hash> OP_EQUALVERIFY <OP_1> <A pubkey> <B pubkey> <OP_2> <OP_CHECKMULTISIG>
 ```
 
-A valid scriptSig requires three data sections, one for each of the `OP_HASH160` as the source data (secret) to generate a match for the given hash, and one signature from A or B to ensure nobody else can claim the value with the hash data alone.
+A valid scriptSig requires three data pushes, one for each of the two `OP_HASH160` as the source data (the secrets) to generate a match for the given hash, and one signature from A or B to ensure nobody else can claim the value with the secret data alone.
 
-### Penny Banks (PB)
+### Penny Bank (PB)
 
-A Penny Bank (abbreviated `PB`) is created by generating a series of small proof-of-work challenges that divide an amount of bitcoin into smaller values to be individually exchanged.  Each challenge in the series has a secret bitstring with a size calculated such that the value it represents matches [current block difficulty](#difficulty) in number of hashes required to generate a given SHA-256 hash. The resulting series of hashes collectively represent a larger bitcoin value as a set of smaller proof-of-works equal to the bitcoin itself.
+A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.
 
-For two parties to mutually agree on a `PB` they must each provide and verify a set of challenges that equal in total difficulty, and together these two sets form the foundation for a `PB` transaction
+The PB is created by first generating a series of small proof-of-work challenges that divide an amount of bitcoin into smaller values to be individually exchanged.  Each challenge in the series has a secret bitstring with a size calculated such that the value it represents matches [current block difficulty](#difficulty) in number of hashes required to generate a given SHA-256 hash. The resulting series of hashes collectively represent the total PB value as a set of smaller proof-of-works equal to the bitcoin itself (it would require as many hashes to do these proofs as it would be to mine new bitcoin of that value).
 
-This transaction uses a `P2SH` conditional multisig output for the main balance available in the `PB`, and a `P2PKH` for each of the parties to carry forward the balance not associated with the bank.  Like [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party), this transaction is kept private between the two parties and only used as a last resort if either party misbehaves.  The un-broadcast transaction can then be updated and "re-balanced" over time as value is exchanged, adjusting the amounts of the outputs and generating new signatures.
+For two parties to mutually agree on a `PB` they must each provide and verify a set of challenges that equal in total difficulty, and together these two sets form the foundation for a `P2CM` that holds/locks the total value. A private [2-of-2 multisig](https://bitcoin.org/en/developer-guide#multisig) input `PB` transaction is then created that sends the main balance available to the `P2CM` (as a P2SH) output, and includes a `P2PKH` for each of the parties to carry forward the balances not being used for or already exchanged in microtransactions.
 
-In order to guarantee a `PB` is funded without being broadcast, a `P2SH` specifying the `PB` as the output is broadcast and validated with a [2-of-2 multisig](https://bitcoin.org/en/developer-guide#multisig) so that both parties must agree upon and sign the outputs in order to use the full transaction as-is at any point. When either party wants to settle and close the `PB`, the balances are updated and the `P2SH` is removed so that just normal outputs remain.
+Like [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party), this main `PB` transaction is kept private between the two parties and only used as a last resort if either party misbehaves.  The un-broadcast transaction can then be updated and "re-balanced" over time as value is exchanged, adjusting the amounts of the outputs and generating new signatures.
+
+In order to guarantee a `PB` is funded without being broadcast, a `P2SH` specifying it as the output is broadcast and validated before beginning any microtransactions. When either party wants to settle and close the `PB`, the balances are updated and the `P2CM` is removed so that just normal outputs remain.  As a last resort, either party may broadcast the last signed transaction which will freeze the `PB` at that point and the value remaining sent to the `P2CM` will be locked until either party either does the proof-of-works or they begin cooperating again.
 
 
 <a name="difficulty" />
@@ -51,19 +53,26 @@ The value of every bitcoin is backed by the current [difficulty](https://en.bitc
 
 When Alice wants to perform microtransactions with Bob, they begin by creating multiple sets of small proof-of-work challenges by calculating the current hashes-per-satoshi and generating an array of random bitstrings of the appropriate size to divide a larger value into the individual small values per transaction.  The number of bitstrings in a set, the size of each individual bitstring, and the total number of sets created may vary by application. (TODO: design one or more standard defaults for these that cover most use cases)
 
-Alice then creates the sets of their hashes as well the final `ripemd160(sha256([set]))` of each complete set and sends Bob all of the identically-sized sets to choose from.  Bob can then randomly select one of them and challenge Alice to reveal the source secret bitstrings of all of the other sets in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob has validated and selected a set from Alice, they perform the same process in reverse with matching sets to have Alice choose/validate a set as well.
+One example set:
+```json
+{
+  "challenges":["0b14..","71cf..",...], // sha256's of each secret
+  "secrets":["ae29..","b388..",...],
+  "hash160":"6c05.." // the ripemd160(sha256(secrets))
+}
+```
 
-At this point both Alice and Bob have a list of small proof-of-works that add up to a larger bitcoin value and can create a `PB` transaction.  The required conditional multisig script is generated using both of the double-hashes of the selected sets, one from Alice and one from Bob.  This requires that all of the secrets must be known from both sets in order to generate the correct data input claim the balance assigned to the `P2SH`, neither party has access to this output without doing the amount of work to derive the secrets for it.
+Alice then creates the sets of their hashes as well the final `ripemd160(sha256([set]))` of each complete set and sends Bob just the challenges and final hash of all of the identically-sized sets.  Bob can then randomly select one of them and challenges Alice to reveal the source secret bitstrings of all of the other sets in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob has validated and selected a set from Alice, they perform the same process in reverse with matching sets to have Alice choose/validate a set as well.
 
-Once both of them exchange their signatures of the agreed upon `PB`, then Alice creates and broadcasts a normal `P2SH` transaction to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
+At this point both Alice and Bob have a list of small proof-of-works that add up to a larger bitcoin value and can create a `P2CM` transaction.  The required conditional multisig script is generated using both of the hashes of the selected sets, one from Alice and one from Bob.  This requires that all of the secrets must be known from both sets in order to generate the correct data input claim the balance assigned to the `P2SH`, neither party has access to this output without doing the amount of work to derive the secrets for it.
 
-As Alice and Bob exchange the actual small asset/values in a microtransaction they can also exchange the secret bitstrings from their sets for the correct value and validate it. At regular intervals either side may request a re-balance, exchanging and signing an updated `PB` with the balances of the `P2SH` and `P2PKH` outputs adjusted accordingly.
+Once both of them exchange their signatures of the agreed upon `PB` transaction, then Alice creates and broadcasts a normal `P2SH` to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
+
+As Alice and Bob exchange the actual small asset/values in a microtransaction they can also exchange the secret bitstrings from their sets for the correct value and validate it. At regular intervals either side may request a re-balance, exchanging and signing an updated `PB` with the balances of the `P2CM` and `P2PKH` outputs adjusted accordingly.
 
 This model incentivises both parties to cooperate to mutually unlock the value over time.  The bitcoin in the bank is locked and inaccessible to either side without cooperation or hashing, and since the difficulty is identical to mining the main blockchain it is of no current value to withhold or abandon the exchange.
 
-If either party misbehaves or stops providing value, the other has a valid `PB` to broadcast to permanently freeze the exchange at that point.  If the source set of secret bitstrings is stored by both, at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen conditional multisig as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2SH` value, but this process may offer little reward given the value of hashing for the main blockchain, the frozen `PB` transactions act as a long term mutual debt/asset for both parties, owned by neither.
-
-The `PB` transactions may include additional inputs and outputs (such as `OP_RETURN`) to include custom requirements or involve additional parties for arbitration, and the `P2SH` script may also be customized as needed for different applications.
+If either party misbehaves or stops providing value, the other has a valid transaction to broadcast to permanently freeze the exchange at that point.  If the source set of secret bitstrings is stored by both, at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen `P2CM` as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2CM` value themselves, but this process may offer little reward given the value of hashing for the main blockchain, the frozen transactions act as a long term mutual debt/asset for both parties, owned by neither.
 
 Summary steps:
 
