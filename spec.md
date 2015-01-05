@@ -1,10 +1,12 @@
 # Penny Bank - Distributed Bitcoin Microtransactions
 
+> This is a work-in-progress, once test implementations are interoperating this document will be reorganized and cleaned up, feedback is still encouraged even in this state
+
 ## Abstract
 
 The architecture of the bitcoin blockchain does not support microtransactions without fees in order to reward the network for storing the ledger, small transactions are simply not economically valuable enough to maintain in a distributed blockchain.
 
-This outlines a simple technique to turn a larger bitcoin value into miniscule amounts that can be individually transferred between any two parties without requiring trust or timelocks, and while minimizing the potential for fees and "dust" transactions.  It shows how to create a temporary side-ledger to use for exchanging the microtransactions based on the same proof-of-work mining value of the bitcoin blockchain.
+This outlines a simple technique to turn a larger bitcoin value into miniscule amounts that can be individually transferred between any two parties without requiring trust, timelocks, oracles, or other third parties, and while minimizing the potential for fees and "dust" transactions.  It shows how to create a temporary side-ledger to use for exchanging the microtransactions based on the same proof-of-work mining value of the bitcoin blockchain.
 
 ## Motivation
 
@@ -13,6 +15,16 @@ With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/b
 The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party) technique works within the current limits and has had some early adoption, but it can now be significantly simplified and aligned with the core value structure of the blockchain, proof-of-work based hashing. The proposed [zero-knowledge contingent payment](https://en.bitcoin.it/wiki/Zero_Knowledge_Contingent_Payment) is also a good foundation, but instead of an external protocol the contingency function is included here as part of the transaction itself.
 
 There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that the proposal here also has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full side blockchain.
+
+## Model
+
+A "penny bank" is a mechanism for placing some amount of bitcoin on hold between two parties without involving another third party, such that those two parties can then exchange smaller amounts of value over time independently.  This requires that one or both parties be willing to source that amount of value and have it locked between them, so that only through cooperation can it be unlocked again.
+
+The penny bank acts as a simple mechanical escrow, where the funds are guaranteed to be available to the two parties, but only they can mutually agree to further release funds.  If either party stops cooperating or misbehaves, the funds at that point remain locked until cooperation begins again.
+
+While in many common microtransaction scenarios there is some amount of trust or reputation with one of the parties so that having funds locked indefinitely is not a large concern, when there is limited trust then the locked value should start as a small value to reduce the risk, the only side-effect being a larger percentage of fees on the transaction to fund it.
+
+This proposal also currently focuses only on the core locking mechanism and exchanges, it is possible to add timelocks and create more complex transactions that further reduce the risk of funds remaining locked.
 
 ## Specification
 
@@ -39,7 +51,9 @@ For two parties to mutually agree on a `PB` they must each provide and verify a 
 
 Like [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party), this main `PB` transaction is kept private between the two parties and only used as a last resort if either party misbehaves.  The un-broadcast transaction can then be updated and "re-balanced" over time as value is exchanged, adjusting the amounts of the outputs and generating new signatures.
 
-In order to guarantee a `PB` is funded without being broadcast, a `P2SH` specifying it as the output is broadcast and validated before beginning any microtransactions. When either party wants to settle and close the `PB`, the balances are updated and the `P2CM` is removed so that just normal outputs remain.  As a last resort, either party may broadcast the last signed transaction which will freeze the `PB` at that point and the value remaining sent to the `P2CM` will be locked until either party either does the proof-of-works or they begin cooperating again.
+In order to guarantee a `PB` is funded without being broadcast, a `P2SH` specifying it as the output is broadcast and validated before beginning any microtransactions.  This `P2SH` source transaction may from either party, or may be created jointly by both parties so that neither is taking the risk alone by locking only their value.  (TODO: document different common microtransaction patterns that use either/both funding models)
+
+When either party wants to settle and close the `PB`, the balances are updated and the `P2CM` is removed so that just normal outputs remain.  As a last resort, either party may broadcast the last signed transaction which will freeze the `PB` at that point and the value remaining sent to the `P2CM` will be locked until either party either does the proof-of-works or they begin cooperating again.
 
 
 <a name="difficulty" />
@@ -87,7 +101,7 @@ Summary steps:
 
 #### Penny Bankers
 
-> work in progress
+> TODO: work in progress, this is where microtransactions can get really interesting
 
 Anyone can create a pair of Penny Banks with one or more well-known "Penny Bankers", one for credits and one for debits.  These `PBs` can then be used as a method to perform small microtransactions with any third party without requiring a `PB` for each third party, minimizing the risk and amount of bitcoin locked in any `PB`.  The "Banker" will manage the pair of PBs in order to be available to clear microtransactions with the third party or the third party's banker.
 
