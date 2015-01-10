@@ -4,6 +4,8 @@ var bitcore = require('bitcore');
 var A_secret = crypto.randomBytes(16);
 var B_secret = crypto.randomBytes(16);
 
+console.log("secrets",A_secret.toString('hex'),B_secret.toString('hex'));
+
 function hash160(buf)
 {
   var sha256 = crypto.createHash('sha256').update(buf).digest();
