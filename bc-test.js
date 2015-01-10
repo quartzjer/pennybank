@@ -31,7 +31,7 @@ var privateKey2 = new bitcore.PrivateKey('L4PqnaPTCkYhAqH3YQmefjxQP6zRcF4EJbdGqR
 var publicKey1 = privateKey1.publicKey;
 var publicKey2 = privateKey2.publicKey;
 var P2SHScript = new bitcore.Script.buildMultisigOut([publicKey1, publicKey2], 1);
-console.log(P2SHScript);
+console.log(P2SHScript.toString());
 var P2SHFund = P2SHScript.toScriptHashOut();
 console.log(P2SHFund);
 var address = P2SHFund.toAddress();
