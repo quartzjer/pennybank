@@ -1,3 +1,5 @@
+var expect = require('chai').expect;
+
 var crypto = require('crypto');
 var bitcore = require('bitcore');
 

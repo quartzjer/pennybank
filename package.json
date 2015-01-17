@@ -5,7 +5,8 @@
   "dependencies": {
     "bcoin": "^0.14.4",
     "bitcoinjs-lib": "^1.4.2",
-    "bitcore": "^0.8.6",
+    "bitcore": "git://github.com/quartzjer/bitcore.git",
+    "bitcore-explorers": "0.0.3",
     "helloblock-js": "^0.2.5"
   },
   "devDependencies": {
