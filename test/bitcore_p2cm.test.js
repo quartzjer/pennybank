@@ -59,17 +59,19 @@ describe('challenge', function(){
         console.log("funded to",id);
 
         var tx2 = new bitcore.Transaction()
-          .from({txId:id, outputIndex:0, inputIndex:0, satoshis:10000, script:P2SHFund.toString()}, [publicKey1, publicKey2], 1)
+//          .from({txId:id, outputIndex:0, inputIndex:0, satoshis:10000, script:P2SHFund.toString()}, [publicKey1, publicKey2], 1)
+          .from({txId:id, outputIndex:0, inputIndex:0, satoshis:10000, script:P2SHFund.toString()}, [publicKey1, publicKey2], 1, P2CMScript)
           .to(address, 10000)
           .sign(privateKey2);
 
-    //    console.log('tx2 input',tx2.inputs[0]);
+    console.log('\ntx2 input',tx2.inputs[0]);
 
         // work around hard-wired multisig to get the signature (TODO make a real input class for P2CM)
-    var signature = Sighash.sign(tx2, privateKey2, 1, 0, P2CMScript).toBuffer();
+//    var signature = Sighash.sign(tx2, privateKey2, 1, 0, P2CMScript).toBuffer();
     //    console.log("tx2 signed",signature);
           
         // use the real script
+    /*
         var s = new bitcore.Script();
         s.add('OP_0');
         s.add(signature);
@@ -78,8 +80,9 @@ describe('challenge', function(){
         s.add(P2CMScript.toBuffer());
         console.log("INPUT",s.toString());
         tx2.inputs[0].setScript(s);
-        console.log(tx2.toJSON());
-        console.log("CHECK",tx2.serialize())
+    */
+        console.log("\ntx2 json",tx2.toJSON());
+        console.log("\ntx2 raw hex",tx2.serialize())
         broadcast(tx2, function(id2){
           console.log("funded back to",id2);
           expect(id2).to.exist();
