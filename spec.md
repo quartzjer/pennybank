@@ -1,4 +1,4 @@
-# Penny Bank - Distributed Bitcoin Microtransactions
+# Bitcoin Microtransaction Smart Contracts
 
 > This is a work-in-progress, once test implementations are interoperating this document will be reorganized and cleaned up, feedback is still encouraged even in this state
 
@@ -6,15 +6,15 @@
 
 The architecture of the bitcoin blockchain does not support microtransactions without fees in order to reward the network for storing the ledger, small transactions are simply not economically valuable enough to maintain in a distributed blockchain.
 
-This outlines a simple technique to turn a larger bitcoin value into miniscule amounts that can be individually transferred between any two parties without requiring trust, timelocks, oracles, or other third parties, and while minimizing the potential for fees and "dust" transactions.  It shows how to create a temporary side-ledger to use for exchanging the microtransactions based on the same proof-of-work mining value of the bitcoin blockchain.
+This outlines a simple technique to create a smart contract that puts a larger bitcoin value in mutual escrow between two parties, such that miniscule amounts of that value can be transacted without requiring additional trust, timelocks, oracles, or other third parties, and while minimizing the potential for fees and "dust" transactions.  It shows how to create a temporary side-ledger to use for exchanging the microtransactions based on the same proof-of-work mining value of the bitcoin blockchain.
 
 ## Motivation
 
-With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses), new types of scripts can be used in transactions and will accepted into the blockchain by updated miners.  While many opcodes are still [disabled](https://en.bitcoin.it/wiki/Script#Words) to minimize the risk of a hard fork, only an `[OP_HASH256](https://en.bitcoin.it/wiki/Script#Crypto)` is required to enable proof-of-work based micro-transactions.
+With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses), new types of scripts can be used in transactions and will accepted into the blockchain by updated miners.  While many opcodes are still [disabled](https://en.bitcoin.it/wiki/Script#Words) to minimize the risk of a hard fork, only a common `[OP_HASH160](https://en.bitcoin.it/wiki/Script#Crypto)` is required to enable proof-of-work based micro-transactions.
 
 The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party) technique works within the current limits and has had some early adoption, but it can now be significantly simplified and aligned with the core value structure of the blockchain, proof-of-work based hashing. The proposed [zero-knowledge contingent payment](https://en.bitcoin.it/wiki/Zero_Knowledge_Contingent_Payment) is also a good foundation, but instead of an external protocol the contingency function is included here as part of the transaction itself.
 
-There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that the proposal here also has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full side blockchain.
+There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that this proposal also has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full sidechain.
 
 ## Model
 
