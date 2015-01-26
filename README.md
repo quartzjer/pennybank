@@ -1,6 +1,4 @@
-Penny Bank - Distributed Bitcoin Microtransactions
-==================================================
+Penny Bank - Bitcoin Microtransaction Smart Contracts
+=====================================================
 
-> this repo is still a [work in progress](https://github.com/quartzjer/pennybank/issues), adding working test code and improving the spec
-
-See the [draft spec](spec.md), issues and pull requests welcome in this repo for feedback, sample code, and examples.
+See the [site](http://quartzjer.github.io/pennybank/) or go directly to the [draft spec](spec.md).
