@@ -6,6 +6,7 @@ var Sighash = require('../node_modules/bitcore/lib/transaction/sighash'); // tem
 var explorers = require('bitcore-explorers');
 var insight = new explorers.Insight(bitcore.Networks.testnet);
 
+// example successful testnet p2cm http://explorer.chain.com/transactions/22ac9b05f765ac5c7e830b826718f1c43a686f7d398c00bc84bf1c79d51d4499
 
 // testnet
 var privateKey = bitcore.PrivateKey({
