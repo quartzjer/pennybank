@@ -1,40 +1,187 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Bitcoin Microtransaction Smart Contracts</title>
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Penny Bank</h1>
+<head>
 
-        <p class="view"><a href="https://github.com/quartzjer/pennybank">View on GitHub</a></p>
+  <meta charset="UTF-8">
 
-      </header>
-      <section>
-        <h1>
-<a id="penny-bank---distributed-bitcoin-microtransactions" class="anchor" href="#penny-bank---distributed-bitcoin-microtransactions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bitcoin Microtransaction Smart Contracts</h1>
+  <title>Penny Bank - Bitcoin Microtransaction Smart Contracts</title>
 
-<blockquote>
-<p>this is still a <a href="https://github.com/quartzjer/pennybank/issues">work in progress</a></p>
-</blockquote>
+  <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
 
-<p>Penny Bank is a project to add microtransaction support to bitcoin without requiring any core changes, only by using a custom transaction script and a simple interoperable smart contracts between two parties.</p>
+  <link rel="stylesheet" href="stylesheets/normalize.css">
 
-<p>See the <a href="https://github.com/quartzjer/pennybank/blob/master/spec.md">draft spec</a>, and a working <a href="https://github.com/quartzjer/pennybank/blob/master/test/bitcore_p2cm.test.js#L9">testnet example</a>, issues and pull requests welcome  for feedback, sample code, and more examples.</p>
+  <style>html {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+}
 
-      </section>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
+*, *:before, *:after {
+  -moz-box-sizing: inherit;
+       box-sizing: inherit;
+}
+
+html {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  max-width: 1024px;
+}
+
+section {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  padding: 0 8%;
+}
+@media screen and (max-width: 500px) {
+  section {
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    padding: 0 8%;
+  }
+}
+
+aside {
+  width: 35%;
+  text-align: center;
+}
+@media screen and (max-width: 500px) {
+  aside {
+    width: 100%;
+  }
+}
+aside img {
+  margin-top: -2px;
+}
+@media screen and (max-width: 500px) {
+  aside img {
+    width: 180px;
+  }
+}
+
+main {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding-left: 8%;
+  padding-top: 30px;
+}
+@media screen and (max-width: 500px) {
+  main {
+    padding-left: 0;
+  }
+}
+
+h1, h2, p, a {
+  font-family: Lato, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+a {
+  text-decoration: none;
+  color: #3ab2da;
+}
+
+h1 {
+  font-size: 80px;
+  font-weight: 300;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 50px;
+    margin-top: 0;
+  }
+}
+
+h2 {
+  font-weight: normal;
+  font-size: 26px;
+  color: #999;
+  margin-bottom: 26px;
+}
+
+p {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+ul {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 26px;
+}
+ul li {
+  width: 33%;
+}
+@media screen and (max-width: 768px) {
+  ul li {
+    width: 50%;
+  }
+}
+ul li + li {
+  margin-left: 20px;
+}
+ul li a {
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  background: #ffba4c;
+  padding: 10px;
+  border-radius: 8px;
+  color: #fff;
+  border: 3px solid #ffba4c;
+}
+ul li a.hollow {
+  background: none;
+  color: #ffba4c;
+}</style>
+
+</head>
+
+<body>
+
+  <section>
+  <aside>
+    <img src="https://dl.dropboxusercontent.com/u/360110/hosted/pennybank.svg" width="100%" />
+  </aside>
+  <main>
+    <h1><b>Penny</b> Bank</h1>
+    <h2>Bitcoin Microtransaction Smart Contracts</h2>
+
+    <ul>
+      <li>
+        <a href="https://github.com/quartzjer/pennybank">Github</a>
+      </li>
+      <li>
+        <a class="hollow" href="https://github.com/quartzjer/pennybank/blob/master/spec.md">Draft Spec</a>
+      </li>
+    </ul>
+
+    <p>Penny Bank is a project to add microtransaction support to bitcoin without requiring any core changes, only by using a custom transaction script and a simple interoperable smart contracts between two parties.</p>
+
+    <p>See the <a href="https://github.com/quartzjer/pennybank/blob/master/spec.md">draft spec</a>, and a working <a href="https://github.com/quartzjer/pennybank/blob/master/test/bitcore_p2cm.test.js#L9">testnet example</a>, issues and pull requests welcome for feedback, sample code, and more examples.</p>
+  </main>
+</section>
+
+</body>
+
 </html>
