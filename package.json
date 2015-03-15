@@ -4,10 +4,12 @@
   "description": "Penny Bank - Distributed Bitcoin Microtransactions",
   "dependencies": {
     "bcoin": "^0.14.4",
+    "bignum": "^0.9.2",
     "bitcoinjs-lib": "^1.4.2",
     "bitcore": "git://github.com/quartzjer/bitcore.git",
     "bitcore-explorers": "0.0.3",
-    "helloblock-js": "^0.2.5"
+    "helloblock-js": "^0.2.5",
+    "minimist": "^1.1.1"
   },
   "devDependencies": {
     "chai": "*",
