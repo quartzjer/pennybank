@@ -14,7 +14,7 @@ With the rules for accepted P2SH opcodes relaxing [in 0.10](https://github.com/b
 
 The existing [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_7:_Rapidly-adjusted_.28micro.29payments_to_a_pre-determined_party) technique demonstrates how to modify a private transaction but requires a trust model based on timelocks and access to update signatures per value exchange, which is not ideal in many microtransaction situations. The proposed [zero-knowledge contingent payment](https://en.bitcoin.it/wiki/Zero_Knowledge_Contingent_Payment) is also a good foundation, but instead of an external protocol the contingency function is included here as part of the transaction itself.
 
-There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that this proposal also has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full sidechain.
+There is also some similarities to the [sidechains paper](http://www.blockstream.com/sidechains.pdf) in that this proposal has the properties of trustlessness (not relying on external parties) and uses lists of hashes to verify proof-of-work, but the scope is limited to acting as a simple transient side-ledger versus a two-way pegged full sidechain.
 
 ## Model
 
@@ -22,7 +22,7 @@ A "penny bank" is a mechanism for placing some amount of bitcoin on hold between
 
 The penny bank creation process negotiates a simple escrow where the funds are guaranteed to be available to the two parties, but only they can mutually agree to release any funds.  If either party stops cooperating or misbehaves, the funds at that point remain frozen until cooperation begins again or the remaining proof of work is performed.
 
-While in many common microtransaction scenarios there is some amount of trust or reputation with one of the parties, and having funds locked in an escrow is not a large concern.  When there is limited trust then the locked value should start as a small value to reduce the risk, the only side-effect being a larger percentage of fees on the transaction to fund it.
+In many common microtransaction scenarios there is some amount of prior trust or reputation with one of the parties (such as service providers), so having funds locked in an escrow is not a large concern.  When there is limited or no trust then the locked value should start very small to reduce the risk, the only side-effect being a larger percentage of fees on the transaction to fund it.
 
 This proposal also only currently focuses on the core locking mechanism and exchanges, it is possible to add timelocks and create more complex transactions that further reduce the risk of funds remaining locked.
 
