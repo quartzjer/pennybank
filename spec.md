@@ -87,29 +87,26 @@ An example set:
 
 Each `PoWS` has a key of the `ripemd160(sequence digest)` and the value is the `sha256(tail)` to identify the final value in the sequence.
 
-> work in progress, converting to sequence flow
+Alice generates a set with a minimum number of `PoWS` and send it to Bob.  If the satoshis, bits, and number of `PoWS` meet Bob's requirements then they select one of the PoWS and challenges Alice to reveal the head bitstrings of all of the others in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob has validated a set and selected a single `PoWS` from Alice they perform the same process in reverse to have Alice choose/validate a `PoWS` from Bob as well.
 
-> Alice then creates the sets of their hashes as well the final `ripemd160(sha256([set]))` of each complete set and sends Bob just the challenges and final hash of all of the identically-sized sets.  Bob can then randomly select one of them and challenges Alice to reveal the source secret bitstrings of all of the other sets in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob has validated and selected a set from Alice, they perform the same process in reverse with matching sets to have Alice choose/validate a set as well.
+At this point both Alice and Bob have enough knowledge to verify a sequence of small proof-of-works that verifiably add up to a larger bitcoin value and can create a `P2CM` transaction.  The required conditional multisig script is generated using both of the ripemd160 digests of the selected `PoWS`, one from Alice and one from Bob.
 
-> At this point both Alice and Bob have a list of small proof-of-works that add up to a larger bitcoin value and can create a `P2CM` transaction.  The required conditional multisig script is generated using both of the hashes of the selected sets, one from Alice and one from Bob.  This requires that all of the secrets must be known from both sets in order to generate the correct data input claim the balance assigned to the `P2SH`, neither party has access to this output without doing the amount of work to derive the secrets for it.
+Once both Alice and Bob exchange their signatures of the agreed upon `PB` transaction, then Alice creates and broadcasts a normal `P2SH` to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
 
-> Once both of them exchange their signatures of the agreed upon `PB` transaction, then Alice creates and broadcasts a normal `P2SH` to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
+As Alice and Bob exchange the actual small asset/values in a microtransaction they also exchange the secret bitstrings to represent that value of satoshis as a sequence difference from the last one starting with the tail.  Only the bitstring and its sequence are required to be sent to unlock the difference in satoshis, this can currently be done in as little as 8 bytes.
 
-> As Alice and Bob exchange the actual small asset/values in a microtransaction they can also exchange the secret bitstrings from their sets for the correct value and validate it. At regular intervals either side may request a re-balance, exchanging and signing an updated `PB` with the balances of the `P2CM` and `P2PKH` outputs adjusted accordingly.
-
-This model incentivises both parties to cooperate to mutually unlock the value over time.  The bitcoin in the bank is locked and inaccessible to either side without cooperation or hashing, and since the difficulty is identical to mining the main blockchain it is of no current value to withhold or abandon the exchange.
-
-If either party misbehaves or stops providing value, the other has a valid transaction to broadcast to permanently freeze the exchange at that point.  If the source set of secret bitstrings is stored by both, at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen `P2CM` as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2CM` value themselves, but this process may offer little reward given the value of hashing for the main blockchain, the frozen transactions act as a long term mutual debt/asset for both parties, owned by neither.
+If either party misbehaves or stops providing value, the other has a valid transaction to broadcast to permanently freeze the exchange at that point.  If the `PoWS` data is stored by both then at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen `P2CM` as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2CM` value themselves.
 
 Summary steps:
 
-* Alice->Bob offer sets of small challenges
-* Bob->Alice choose and verify a set of challenges and offer sets in return
-* Alice->Bob choose and verify a set, create and sign a PB and send to Bob
+* Alice->Bob offer a set
+* Bob->Alice choose and verify a PoWS from the set and offer a set in return
+* Alice->Bob choose and verify a PoWS, create and sign a PB and send to Bob
 * Bob->Alice return signed PB
 * Alice broadcasts funding of PB
 * Bob verifies funding, value is now locked in the PB
-* over time PB is re-balanced with new signatures, either can broadcast it and freeze it at that point locking the balances in place
+* either can broadcast it and freeze it at that point locking the balances in place
+* when finished, the PB is rebalanced with normal outputs, signed, and broadcast
 
 
 #### Multi-Party Penny Bankers
