@@ -45,7 +45,7 @@ A valid scriptSig requires three data pushes, one for each of the two `OP_HASH16
 
 A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.
 
-The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny is an 8 byte value, 3 bytes of the sequence number (big endian) and a 5-byte secret.  A `pence` is a 32 byte random nonce and a sequence of two or more pennies that are created by performing a SHA-256 digest of the nonce XOR'd with previous penny in the sequence.  The first penny is `p0` (sequence 0) and its secret is the random seed of the `pence`, with each sequentially increasing penny's secrets being the first 5 bytes of the previous one's digest output.  Given any penny, all higher sequences can be immediately calculated, but lower ones could only be derived through brute force hashing.
+The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny is an 8 byte value, 3 bytes of the sequence number (big endian) and a 5-byte secret.  A `pence` is a 24 byte random nonce and a sequence of two or more pennies that are created by performing a SHA-256 digest of the nonce and the previous penny in the sequence.  The first penny is `p0` (sequence 0) and its secret is the random seed of the `pence`, with each sequentially increasing penny's secret being the first 5 bytes of the previous one's digest output.  Given any penny, all higher sequences can be immediately calculated, but lower ones could only be derived through brute force hashing.
 
 The number of pennies in a `pence` must represent a [difficulty](#value) *equal to or greater than the total `PB` bitcoin value*, it must require at least as many hashes to do these proofs as it would be to mine new bitcoin of that value.
 
@@ -61,7 +61,7 @@ When either party wants to settle and close the `PB`, the balances are updated a
 
 
 <a name="penny" />
-#### Penny Value (difficulty)
+#### Penny Value (difficulty based)
 
 The value of every bitcoin is backed by the current [difficulty](https://en.bitcoin.it/wiki/Difficulty), which reduces to a number of hashes-per-satoshi ([example formula](http://bitcoin.stackexchange.com/questions/12013/how-many-hashes-create-one-bitcoin/12030#12030).  
 
@@ -83,7 +83,7 @@ An example set:
 ```json
 {
   "N":1234,
-  "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08",
+  "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8",
   "pence":{
     "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"b8a0eb85548d3df024db5eb8b00a089fc3d78b2c9ddef9006da7b49050c6f5b4",
     ...
