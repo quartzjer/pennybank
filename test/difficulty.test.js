@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 var crypto = require('crypto');
 var libdifficulty = require('../difficulty.js');
 
-describe('challenge', function(){
+describe('difficulty', function(){
 
   it('should export an object', function(){
     expect(libdifficulty).to.be.an('object');
