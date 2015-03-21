@@ -45,7 +45,7 @@ A valid scriptSig requires three data pushes, one for each of the two `OP_HASH16
 
 A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.
 
-The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny in the sequence is a 5-byte secret value that represents a single proof of work result.  A `pence` is a 32 byte random nonce and a sequence of pennies that are created by performing a SHA-256 digest of the nonce and the previous value in the sequence.  The first penny is `p0` and its 5 bytes are the random seed of the `pence`.
+The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny is an 8 byte value, 3 bytes of the sequence number (big endian) and a 5-byte secret.  A `pence` is a 32 byte random nonce and a sequence of pennies that are created by performing a SHA-256 digest of the nonce XOR'd with previous penny in the sequence.  The first penny is `p0` (sequence 0) and its secret is the random seed of the `pence`, with each sequentially increasing penny's secrets being the first 5 bytes of the previous one's digest output.  Given any penny, all higher sequences can be immediately calculated, but lower ones could only be derived through brute force hashing.
 
 The number of pennies in a `pence` must represent a [difficulty](#value) *equal to or greater than the total `PB` bitcoin value*, it must require at least as many hashes to do these proofs as it would be to mine new bitcoin of that value.
 
@@ -81,6 +81,7 @@ An example set:
 ```json
 {
   "n":1234,
+  "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08",
   "pence":{
     "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"b8a0eb85548d3df024db5eb8b00a089fc3d78b2c9ddef9006da7b49050c6f5b4",
     ...
@@ -96,7 +97,7 @@ At this point both Alice and Bob have enough knowledge to verify a sequence of s
 
 Once both Alice and Bob exchange their signatures of the agreed upon `PB` transaction, then Alice creates and broadcasts a normal `P2SH` to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
 
-As Alice and Bob exchange the actual small asset/values in a microtransaction they also exchange the pennies to represent that value of satoshis as a sequence difference from the last one.  Only the penny's 5 bytes and its sequence are required to be sent to unlock the difference in the `pence`, this can be done in as little as 8 bytes.
+As Alice and Bob exchange the actual small asset/values in a microtransaction they also exchange the pennies to represent that value of satoshis as a sequence difference from the last one.  A penny at any lower point in the pence can be sent to unlock the difference in value from the previous one.
 
 If either party misbehaves or stops providing value, the other has a valid transaction to broadcast to permanently freeze the exchange at that point.  If the `pence` data is stored by both then at any point in the future the two parties may begin cooperating again by exchanging them and using the frozen `P2CM` as the input.  Either side may also decide at some point in the future to perform the remaining hashing work to derive the correct hashes and claim the `P2CM` value themselves.
 
