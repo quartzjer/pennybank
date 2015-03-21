@@ -17,6 +17,7 @@ describe('sequence', function(){
     expect(pows).to.be.an('object');
     expect(pows.head.length).to.be.equal(2);
     expect(pows.tail.length).to.be.equal(2);
+    expect(pows.digest.length).to.be.equal(32);
   });
 
   it('should bitmask', function(){

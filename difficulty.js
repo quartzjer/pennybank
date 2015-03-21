@@ -15,7 +15,7 @@ exports.difficulty = function(args, cbDone)
       var hashespersatoshi = hashperblock.div(satoshi);
       if(argv.debug) console.log('hashes per satoshi:',hashespersatoshi.toString());
       var bits = Math.log(hashespersatoshi) / Math.log(2);
-      cbDone(err, Math.ceil(bits));
+      cbDone(err, Math.ceil(bits), hashespersatoshi);
     });
   });
 }

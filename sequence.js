@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var bignum = require('bignum');
 var argv = require('minimist')(process.argv.slice(2));
 var difficulty = require('./difficulty').difficulty;
 
@@ -7,6 +8,9 @@ exports.sequence = function(satoshi, bits){
   
   // start with a random head
   var head = exports.bitmask(bits, crypto.randomBytes(Math.ceil(bits/8)));
+  
+  // track the sequence digest secret
+  var digest = crypto.createHash('sha256').update(head).digest()
 
   // hash it forward for each satoshi at this difficulty
   var tail = head;
@@ -14,9 +18,10 @@ exports.sequence = function(satoshi, bits){
   {
     var hash = crypto.createHash('sha256').update(tail).digest();
     tail = exports.bitmask(bits, hash);
+    digest = crypto.createHash('sha256').update(digest).update(tail).digest();
   }
   
-  return {head:head, tail:tail};
+  return {head:head, tail:tail, digest:digest};
 };
 
 // return just the masked bits from bytes
@@ -40,11 +45,14 @@ exports.bitmask = function(bits, bytes)
 // handy debugging to run as command line
 if(process.argv[1].indexOf('sequence.js') != -1)
 {
-  var satoshi = argv.btc * (100*100000);
+  var satoshi = bignum(argv.btc * (100*100000));
   if(!satoshi) return console.error('missing arg: --btc x');
   if(typeof argv.debug != 'boolean') argv.debug = true;
-  difficulty(false, function(err, bits){
+  difficulty(false, function(err, bits, hashes){
     if(err) return console.log('errored',err);
+    var total = bignum(satoshi).mul(hashes);
+    var count = total.div(bignum(2).pow(40));
+    console.log('count',satoshi,count,total)
     var start = Date.now();
     var pows = exports.sequence(satoshi, bits);
     console.log('head',pows.head.toString('hex'),'tail',pows.tail.toString('hex'),'at',satoshi,'in',Date.now()-start,'ms');
