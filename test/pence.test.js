@@ -18,6 +18,8 @@ describe('pence', function(){
     expect(pows.p0.length).to.be.equal(5);
     expect(pows.pN.length).to.be.equal(5);
     expect(pows.digest.length).to.be.equal(32);
+    expect(pows.ID.length).to.be.equal(20);
+    expect(pows.N).to.be.equal(10);
   });
 
 

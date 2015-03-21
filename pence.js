@@ -4,10 +4,10 @@ var argv = require('minimist')(process.argv.slice(2));
 var difficulty = require('./difficulty').difficulty;
 
 // generate a pence of the given size
-exports.pence = function(N){
+exports.pence = function(N, nonce){
   
   // start with a random nonce and p0
-  var nonce = crypto.randomBytes(24);
+  if(!nonce) nonce = crypto.randomBytes(24);
   var p0 = crypto.randomBytes(5);
   
   // track the pence digest
@@ -28,7 +28,7 @@ exports.pence = function(N){
     pN = hash.slice(0,5);
   }
   
-  return {nonce:nonce, p0:p0, pN:pN, digest:digest};
+  return {N:N, nonce:nonce, p0:p0, pN:pN, digest:digest, ID:crypto.createHash('ripemd160').update(digest).digest()};
 };
 
 // handy debugging to run as command line
