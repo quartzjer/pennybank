@@ -45,7 +45,7 @@ A valid scriptSig requires three data pushes, one for each of the two `OP_HASH16
 
 A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.
 
-The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny is an 8 byte value, 3 bytes of the sequence number (big endian) and a 5-byte secret.  A `pence` is a 32 byte random nonce and a sequence of pennies that are created by performing a SHA-256 digest of the nonce XOR'd with previous penny in the sequence.  The first penny is `p0` (sequence 0) and its secret is the random seed of the `pence`, with each sequentially increasing penny's secrets being the first 5 bytes of the previous one's digest output.  Given any penny, all higher sequences can be immediately calculated, but lower ones could only be derived through brute force hashing.
+The `PB` contains many small proof-of-work challenges (the pennies) that are created in an ordered sequence called a `pence`.  Each penny is an 8 byte value, 3 bytes of the sequence number (big endian) and a 5-byte secret.  A `pence` is a 32 byte random nonce and a sequence of two or more pennies that are created by performing a SHA-256 digest of the nonce XOR'd with previous penny in the sequence.  The first penny is `p0` (sequence 0) and its secret is the random seed of the `pence`, with each sequentially increasing penny's secrets being the first 5 bytes of the previous one's digest output.  Given any penny, all higher sequences can be immediately calculated, but lower ones could only be derived through brute force hashing.
 
 The number of pennies in a `pence` must represent a [difficulty](#value) *equal to or greater than the total `PB` bitcoin value*, it must require at least as many hashes to do these proofs as it would be to mine new bitcoin of that value.
 
@@ -67,7 +67,9 @@ The value of every bitcoin is backed by the current [difficulty](https://en.bitc
 
 Currently, the difficulty of [40007470271.271](https://bitcoinwisdom.com/bitcoin/difficulty) is based on the rate of 270,591,326 GH/s, which results in approximately [65 GH](https://www.google.com/#q=((270%2C591%2C326+*+60+*+10)+%2F+25)+%2F+100%2C000%2C000) to back the value of one satoshi.
 
-A single penny matches the first 5 bytes of a digest, requiring up to 2^40 hashes, which would currently represent just under [17 satoshis per penny](http://www.wolframalpha.com/input/?i=%282%5E40%29%2F%28%28%28270%2C591%2C326%2C000%2C000%2C000+*+60+*+10%29+%2F+25%29+%2F+100%2C000%2C000%29) of work.  The difficulty slowly increases as computing power increases, so the hashes-per-satoshi will also go up.  Since the hashes-per-penny is currently fixed at the 5 byte size, the number of satoshis per penny will go down over time.
+A single penny locks the first 5 bytes of a digest, requiring up to 2^40 hashes (about 1,100 GH) to derive. One penny would currently represent just under [17 satoshis](http://www.wolframalpha.com/input/?i=%282%5E40%29%2F%28%28%28270%2C591%2C326%2C000%2C000%2C000+*+60+*+10%29+%2F+25%29+%2F+100%2C000%2C000%29) of work.  The difficulty slowly increases as computing power increases, so the hashes-per-satoshi will also go up.  Since the hashes-per-penny is currently fixed at the 5 byte size, the number of satoshis per penny will conversely go down over time.
+
+The maximum sequence of a `pence` is 2^24 (about 17M), so the highest value of a single `PB` is [284M satoshi](http://www.wolframalpha.com/input/?i=%28%282%5E40%29%2F%28%28%28270%2C591%2C326%2C000%2C000%2C000+*+60+*+10%29+%2F+25%29+%2F+100%2C000%2C000%29+*+%282%5E24%29%29), or about 2.8 BTC.
 
 #### Two-Party Penny Banks
 
@@ -75,12 +77,12 @@ A single penny matches the first 5 bytes of a digest, requiring up to 2^40 hashe
 
 When Alice wants to perform microtransactions with Bob, they begin by creating a set of `pence` to use for negotiating a `PB`.
 
-A single `pence` starts with an initial random `p0` and nonce and is recursively hashed to generate the sequence to `pN`, with `N`  matching the `PB` current difficulty value.
+A single `pence` starts with an initial random `p0` and nonce and is recursively hashed to generate the sequence to `pN`, with `N`  being the number of pennies required for the current difficulty and bitcoin value of the `PB`.
 
 An example set:
 ```json
 {
-  "n":1234,
+  "N":1234,
   "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8cd65e1a36171ef08",
   "pence":{
     "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"b8a0eb85548d3df024db5eb8b00a089fc3d78b2c9ddef9006da7b49050c6f5b4",
@@ -89,11 +91,11 @@ An example set:
 }
 ```
 
-Each `pence` has a key of the `ripemd160(pence digest)` and the value is the `sha256(pN)` to identify the final value in the sequence.
+Each `pence` has a unique ID key of the `ripemd160(pence digest)` and the value is the `sha256(pN)` to validate the final value in the sequence.
 
-Alice generates a set with a minimum number of `pence` and send it to Bob.  If the `N` and number of `pence` meet Bob's requirements then they select one of the pence and challenges Alice to reveal the `p0` of all of the others in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof) of the difficulty).  Once Bob has validated a set and selected a single `pence` from Alice they perform the same process in reverse to have Alice choose/validate a `pence` from Bob as well.
+Alice generates a challenge set with a minimum of 100 `pence` and sends it to Bob.  Bob then selects one of the pence and challenges Alice to reveal the `p0` of all of the others in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof)).  Once Bob has validated a set and selected a single `pence` from Alice they perform the same process in reverse to have Alice choose/validate a `pence` from Bob as well.
 
-At this point both Alice and Bob have enough knowledge to verify a sequence of small proof-of-works that verifiably add up to a larger bitcoin value and can create a `P2CM` transaction.  The required conditional multisig script is generated using both of the ripemd160 digests of the selected `pence`, one from Alice and one from Bob.
+At this point both Alice and Bob have enough knowledge to use the sequences of small proof-of-works that verifiably add up to a larger bitcoin value and can create a `P2CM` transaction.  The required conditional multisig script is generated using both of the ripemd160 digests of the selected `pence`, one from Alice and one from Bob.
 
 Once both Alice and Bob exchange their signatures of the agreed upon `PB` transaction, then Alice creates and broadcasts a normal `P2SH` to fund it which Bob can validate like any normal bitcoin transaction.  The value is then locked and inaccessible to either without cooperation or work.
 
@@ -121,7 +123,8 @@ Anyone can create a pair of Penny Banks with one or more well-known public "Penn
 
 When initiating an exchange with a third party, the sender must share the identity of the Banker along with the current debit `PB` set of hashes to act as the "account" so that the third party can validate that it is valid and currently funded.
 
-The recipient must also create/have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each secret bitstring received as a microtransaction can then be validated immediately and locally as part of the `PB` and of the right difficulty, and should then be exchanged with their Banker into their private credit `PB`.  Exchanging these offline is possible but increases the risk of any individual secret bitstring becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them.
+The recipient must also create/have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each secret bitstring received as a microtransaction can then be validated immediately and locally as part of the `PB` and of the right difficulty, and should then be exchanged with their Banker into their private credit `PB`.  Exchanging these offline is possible but increases the risk of any individual penny becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them.
 
 Using multiple Bankers who independently clear with each other helps minimize the visibility of the actual parties performing the microtransactions.
 
+A penny can be represented as a globally unique 28-byte value when prepended with the `pence` ID (ripmemd160 digest).
