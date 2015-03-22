@@ -4,12 +4,12 @@ var argv = require('minimist')(process.argv.slice(2));
 var difficulty = require('./difficulty').difficulty;
 
 // generate a pence of the given size
-exports.pence = function(N, nonce){
+exports.pence = function(N, nonce, p0){
   
   // start with a random nonce and p0
   if(!nonce) nonce = crypto.randomBytes(24);
-  var p0 = crypto.randomBytes(5);
-  
+  if(!p0) p0 = crypto.randomBytes(5);
+
   // track the pence digest
   var digest = crypto.createHash('sha256').update(p0).digest()
 
@@ -21,14 +21,17 @@ exports.pence = function(N, nonce){
   for(var j = 1; j <= N; j++)
   {
     seq.writeUInt32BE(j,0); // get seq in bytes
-    seq.copy(buf,24,1,3); // write in the new sequence
+    seq.copy(buf,24,1,4); // write in the new sequence
     pN.copy(buf,27); // copy in last penny
     var hash = crypto.createHash('sha256').update(buf).digest();
     digest = crypto.createHash('sha256').update(digest).update(buf).digest();
     pN = hash.slice(0,5);
   }
   
-  return {N:N, nonce:nonce, p0:p0, pN:pN, digest:digest, ID:crypto.createHash('ripemd160').update(digest).digest()};
+  var ret = {N:N, nonce:nonce, p0:p0, pN:pN, digest:digest};
+  ret.ID = crypto.createHash('ripemd160').update(digest).digest();
+//  console.log('PENCE',ret)
+  return ret;
 };
 
 // handy debugging to run as command line

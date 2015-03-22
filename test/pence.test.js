@@ -22,5 +22,11 @@ describe('pence', function(){
     expect(pows.N).to.be.equal(10);
   });
 
+  it('should make identical', function(){
+    var pence = libpence.pence(10);
+    var pence2 = libpence.pence(10, pence.nonce, pence.p0);
+    expect(pence.ID.toString('hex')).to.be.equal(pence2.ID.toString('hex'));
+  });
+
 
 });
