@@ -28,8 +28,9 @@ exports.verify = function(set, secrets)
   {
     var p = pence.pence(set.N, set.nonce, p0);
     var id = p.ID.toString('hex');
-    if(!set.pence[id]) console.log('XXX',id,Object.keys(set.pence).length);
     if(!set.pence[id]) return false;
+    // the pN must also match
+    if(set.pence[id].toString('hex') != crypto.createHash('sha256').update(p.pN).digest('hex')) return false;
     delete set.pence[id];
   }
 
