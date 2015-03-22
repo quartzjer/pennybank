@@ -25,7 +25,16 @@ describe('set', function(){
     expect(ID.length).to.be.equal(40);
     expect(set.pence[ID]).to.be.a('string');
     expect(set.pence[ID].length).to.be.equal(64);
+  });
 
+  it('should verify a set', function(){
+    var set = libset.generate(10);
+    var ID = Object.keys(set.pence)[0];
+    delete set.secrets[ID];
+    var secrets = Object.keys(set.secrets).map(function(id){ return set.secrets[id].p0; });
+    expect(secrets.length).to.be.equal(99);
+    expect(libset.verify(set, secrets)).to.be.equal(true);
+    expect(Object.keys(set.pence).length).to.be.equal(1);
   });
 
 

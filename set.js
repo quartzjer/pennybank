@@ -22,12 +22,19 @@ exports.generate = function(N)
 
 exports.verify = function(set, secrets)
 {
-  for(var i = 0; i < 99; i++)
+  // generate a set from each secret and remove it by ID
+  var p0;
+  while(p0 = secrets.pop())
   {
-    var secret = secrets.pop();
-    if(!secret) return false;
-    // TODO
+    var p = pence.pence(set.N, set.nonce, p0);
+    var id = p.ID.toString('hex');
+    if(!set.pence[id]) console.log('XXX',id,Object.keys(set.pence).length);
+    if(!set.pence[id]) return false;
+    delete set.pence[id];
   }
+
+  // should only be one left un-verified
+  if(Object.keys(set.pence).length != 1) return false;
   
   // all good
   return true;
