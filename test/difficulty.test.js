@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 var crypto = require('crypto');
 var libdifficulty = require('../difficulty.js');
 
-describe('challenge', function(){
+describe('difficulty', function(){
 
   it('should export an object', function(){
     expect(libdifficulty).to.be.an('object');
@@ -13,17 +13,17 @@ describe('challenge', function(){
   });
 
   it('should generate a difficulty from fixed values', function(done){
-    libdifficulty.difficulty({hashestowin:'203702905701946867973',bcperblock:'25'}, function(err, bits){
+    libdifficulty.difficulty({hashestowin:'203702905701946867973',bcperblock:'25'}, function(err, hashes){
       expect(err).to.not.exist();
-      expect(bits).to.be.equal(37);
+      expect(hashes.toString()).to.be.equal('8148116228077874718');
       done();
     });
   });
 
   it('should fetch current difficulty from blockexplorer api', function(done){
-    libdifficulty.difficulty({}, function(err, bits){
+    libdifficulty.difficulty({}, function(err, hashes){
       expect(err).to.not.exist();
-      expect(bits).to.be.above(32);
+      expect(hashes).to.exist();
       done();
     });
   });

@@ -11,11 +11,9 @@ exports.difficulty = function(args, cbDone)
     fetch('bcperblock', function(err, data){
       var btc = bignum(data); // 25.0 right now
       if(argv.debug) console.log('node difficulty.js --hashestowin',hashperblock.toString(),'--bcperblock',btc.toString());
-      var satoshi = btc.mul(100*1000000); // convert into satoshi
-      var hashespersatoshi = hashperblock.div(satoshi);
-      if(argv.debug) console.log('hashes per satoshi:',hashespersatoshi.toString());
-      var bits = Math.log(hashespersatoshi) / Math.log(2);
-      cbDone(err, Math.ceil(bits));
+      var hashes = hashperblock.div(btc);
+      if(argv.debug) console.log('hashes per btc:',hashes.toString());
+      cbDone(err, hashes);
     });
   });
 }
@@ -24,9 +22,9 @@ exports.difficulty = function(args, cbDone)
 if(process.argv[1].indexOf('difficulty.js') != -1)
 {
   if(typeof argv.debug != 'boolean') argv.debug = true;
-  exports.difficulty(false, function(err, bits){
+  exports.difficulty(false, function(err, hashes){
     if(err) return console.log('errored',err);
-    console.log('bits required for a proof of one satoshi:',bits);
+    console.log('current hashes required per bitcoin:',hashes);
   });
 }
 
