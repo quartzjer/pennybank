@@ -22,7 +22,7 @@ A "penny bank" is a mechanism for placing some amount of bitcoin on hold between
 
 The penny bank creation process negotiates a simple escrow where the funds are guaranteed to be available to the two parties, but only they can mutually agree to release any funds.  If either party stops cooperating or misbehaves, the funds at that point remain frozen until cooperation begins again or the remaining proof of work is performed.
 
-In many common microtransaction scenarios there is some amount of prior trust or reputation with one of the parties (such as service providers), so having funds locked in an escrow is not a large concern.  When there is limited or no trust then the locked value should start very small to reduce the risk, the only side-effect being a larger percentage of fees on the transaction to fund it.
+In many common microtransaction scenarios there is some prior trust or reputation with one of the parties (such as service providers) where having some funds locked in an escrow with them is not very risky.  When there is limited or no trust then the locked value should be small to reduce the risk, the only side-effect being a larger percentage of fees on the transaction to fund it.
 
 This proposal also only currently focuses on the core locking mechanism and exchanges, it is possible to add timelocks and create more complex transactions that further reduce the risk of funds remaining locked.
 
@@ -33,6 +33,8 @@ In order to perform micro-transactions two parties must first establish that a l
 ### Pay to Script Hash Conditional Multisig (P2CM)
 
 > A *Conditional Multisig* script is only accepted as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) in version [0.10 or later](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses).
+
+This template allows any two or more parties to create a multisig transaction that additionally requires some secret data from each party to be processed.
 
 The conditional multisig script template used here is:
 ```
