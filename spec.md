@@ -46,13 +46,13 @@ A valid scriptSig requires three data pushes, one for each of the two `OP_HASH16
 
 ## Penny Bank (PB)
 
-A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.  The microtransaction value is exchanged by sending `pennies` back and forth  which are verified as being part of a `pence` that is negotiated during setup.  The hash of a `pence` is incorporated into a `P2CM` to guarantee funds are available for the `pennies`.
+A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.  The microtransaction value is exchanged by sending `pennies` back and forth  which are verified as being part of a `pence` from each party that is negotiated during setup.  The hashes of both `pence` are incorporated into a `P2CM` to guarantee funds are available for the `pennies`.
 
 ### Penny
 
 The `PB` contains many small proof-of-work challenges, each one is called a `penny` and is private to one party until revealed to and verified by the other party.
 
-A `penny` is exchanged as an 8 byte value, 3 bytes of a sequence number in big endian followed by a 5-byte secret.
+A `penny` is exchanged as an 8 byte value: 3 bytes of a sequence number in big endian followed by a 5-byte secret.
 
 <a name="pence" />
 ### Pence
@@ -106,13 +106,13 @@ An example set:
   "N":1234,
   "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8",
   "pence":{
-    "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"b8a0eb85548d3df024db5eb8b00a089fc3d78b2c9ddef9006da7b49050c6f5b4",
+    "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"00a0eb85548d3df0",
     ...
   }
 }
 ```
 
-Each `pence` has a key that is the hex of its ID and the value is the `sha256(pN)` to validate the final value in the sequence.
+Each `pence` has a key that is the hex of its ID and the value is the `pN` to validate pennies.
 
 Bob then selects one of the pence and challenges Alice to reveal the `p0` of all of the others in order to validate that they are all sized and calculated correctly (a partial/confidence-based [zero-knowledge proof](http://en.wikipedia.org/wiki/Zero-knowledge_proof)).  Once Bob has validated a set and selected a single `pence` from Alice they perform the same process in reverse to have Alice choose/validate a `pence` from Bob as well.
 
@@ -142,10 +142,10 @@ Summary steps:
 
 Anyone can create a pair of Penny Banks with one or more well-known public "Penny Bankers", one for credits and one for debits.  These `PBs` can then be used as a method to perform small microtransactions with any third party without requiring a `PB` for each third party, minimizing the risk and amount of bitcoin locked in any `PB`.  The "Banker" will manage the pair of private PBs and also be available to any third party to clear microtransactions with them or their banker.
 
-When initiating an exchange with a third party, the sender must share the identity of the Banker along with the current debit `PB` set of hashes to act as the "account" so that the third party can validate that it is valid and currently funded.
+When initiating an exchange with a third party, the sender must share the identity of the Banker along with the current debit `pence` to act as the "account" so that the third party can validate that it is valid and currently funded.
 
-The recipient must also create/have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each secret bitstring received as a microtransaction can then be validated immediately and locally as part of the `PB` and of the right difficulty, and should then be exchanged with their Banker into their private credit `PB`.  Exchanging these offline is possible but increases the risk of any individual penny becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them.
+The recipient must also create/have a `PB` with either the same Banker or with a Banker that will clear values with the sender's. Each `penny` can then be validated immediately and locally and should then be exchanged with their Banker into their private credit `PB`.  Exchanging these offline is possible but increases the risk of any individual `penny` becoming invalid since the time delay between receiving and clearing is a window for the sender to double-spend them.
 
 Using multiple Bankers who independently clear with each other helps minimize the visibility of the actual parties performing the microtransactions.
 
-A penny can be represented as a globally unique 28-byte value when prepended with the `pence` ID (ripmemd160 digest).
+A `penny` can be represented as a globally unique 28-byte value when prepended with the `pence` ID (ripmemd160 digest).
