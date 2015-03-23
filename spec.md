@@ -26,11 +26,12 @@ In many common microtransaction scenarios there is some prior trust or reputatio
 
 This proposal also only currently focuses on the core locking mechanism and exchanges, it is possible to add timelocks and create more complex transactions that further reduce the risk of funds remaining locked.
 
-## Specification
+# Specification
 
 In order to perform micro-transactions two parties must first establish that a larger value is guaranteed to be available to fund the smaller exchanges with a verifiable proof-of-work.  This larger transaction is private to both parties while transacting and acts as the "bank", it is only ever broadcast to the network at the end or whenever either party is finished.  The individual micro-transactions are always private and not broadcast, they are instead accounted for between the two parties as reducing the proof-of-work referenced in the bank transaction.
 
-### Pay to Script Hash Conditional Multisig (P2CM)
+<a name="p2cm" />
+## Pay to Script Hash Conditional Multisig (P2CM)
 
 > A *Conditional Multisig* script is only accepted as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) in version [0.10 or later](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses).
 
@@ -43,17 +44,18 @@ OP_HASH160 <A hash> OP_EQUALVERIFY OP_HASH160 <B hash> OP_EQUALVERIFY <OP_1> <A 
 
 A valid scriptSig requires three data pushes, one for each of the two `OP_HASH160` as the source data (the secrets) to generate a match for the given hash, and one signature from A or B to ensure nobody else can claim the value with the secret data alone.
 
-### Penny Bank (PB)
+## Penny Bank (PB)
 
 A Penny Bank (abbreviated `PB`) is the shared state between two parties that have agreed to exchange microtransactions pinned to the blockchain through a single larger transaction.  The microtransaction value is exchanged by sending `pennies` back and forth  which are verified as being part of a `pence` that is negotiated during setup.  The hash of a `pence` is incorporated into a `P2CM` to guarantee funds are available for the `pennies`.
 
-#### Penny
+### Penny
 
 The `PB` contains many small proof-of-work challenges, each one is called a `penny` and is private to one party until revealed to and verified by the other party.
 
 A `penny` is exchanged as an 8 byte value, 3 bytes of a sequence number in big endian followed by a 5-byte secret.
 
-#### Pence
+<a name="pence" />
+### Pence
 
 A `pence` is defined as a 24 byte random `nonce`, an initial penny called `p0`, and a total number of pennies called `N`.  The individual pennies are derived performing a SHA-256 digest of the 24 byte random nonce combined with the previous penny: `p2 = 0x000002 + sha256(nonce + p1).slice(0,5)`. Each sequentially increasing penny's 5 byte secret is the first 5 bytes of the previous one's digest output.
 
@@ -61,13 +63,13 @@ Given any penny all higher sequences can be immediately calculated, but lower on
 
 The `N` number of pennies in a `pence` must represent a [difficulty](#value) *equal to or greater than the total `PB` bitcoin value*, it must require at least as many hashes to do these proofs as it would be to mine new bitcoin of that value.
 
-#### Pence ID
+### Pence ID
 
 Every `pence` has a unique public/visible ID that is the 20 byte RIPEMD-160 of a `pence digest`, which is calculated when generating the pennies.  The `pence digest` is a roll-up hash of each penny starting with `p0`: `sha256(sha256(sha256(sha256(p0),p1),p2),pN)`.
 
 This digest can only be calculated by obtaining or deriving the source `p0` value which can then be immediately verified against the 20 byte ID.  This is the private source data from each party that locks the `P2CM` to the total proof of work defined by each `pence`.
 
-#### Opening
+### Opening
 
 A private [2-of-2 multisig](https://bitcoin.org/en/developer-guide#multisig) input `PB` transaction is created that sends the main balance available to the `P2CM` (as a P2SH) output, and includes a `P2PKH` for each of the parties to carry forward the balances not being used for or already exchanged in microtransactions.
 
@@ -75,14 +77,14 @@ Similar to [micropayment channels](https://en.bitcoin.it/wiki/Contracts#Example_
 
 In order to guarantee a `PB` is funded without being broadcast, a `P2SH` specifying it as the output is broadcast and validated before exchanging any microtransactions.  
 
-#### Closing
+### Closing
 
 When either party wants to settle and close the `PB`, the balances are updated and the `P2CM` is removed so that just normal outputs remain.  
 
 As a last resort, either party may broadcast the last signed transaction which will freeze the `PB` at that point and the value remaining sent to the `P2CM` will be locked until either party either calculates the remaining pennies or they begin cooperating again.
 
 <a name="penny" />
-#### Penny Value (difficulty based)
+### Penny Value (difficulty based)
 
 The value of every bitcoin is backed by the current [difficulty](https://en.bitcoin.it/wiki/Difficulty), which reduces to a number of hashes-per-satoshi ([example formula](http://bitcoin.stackexchange.com/questions/12013/how-many-hashes-create-one-bitcoin/12030#12030).  
 
@@ -92,7 +94,7 @@ A single penny locks the first 5 bytes of a digest, requiring up to 2^40 hashes 
 
 The maximum sequence of a `pence` is 2^24 (about 17M), so the highest value of a single `PB` is currently [284M satoshi](http://www.wolframalpha.com/input/?i=%28%282%5E40%29%2F%28%28%28270%2C591%2C326%2C000%2C000%2C000+*+60+*+10%29+%2F+25%29+%2F+100%2C000%2C000%29+*+%282%5E24%29%29), or about 2.8 BTC.
 
-#### Two-Party Penny Banks
+## Two-Party Penny Banks
 
 > documentation here is a higher level work in progress, detailed transaction examples forthcoming
 
@@ -134,7 +136,7 @@ Summary steps:
 * when finished, the PB is rebalanced with normal outputs, signed, and broadcast
 
 
-#### Multi-Party Penny Bankers
+## Multi-Party Penny Bankers
 
 > TODO: work in progress, this is how microtransactions can scale to larger use-cases
 
