@@ -106,7 +106,7 @@ An example set:
   "N":1234,
   "nonce":"736711cf55ff95fa967aa980855a0ee9f7af47d6287374a8",
   "pence":{
-    "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"00a0eb85548d3df0",
+    "76a914c9f826620292b696af47ebd2013418e4e6ab6f9288ac":"85548d3df0",
     ...
   }
 }

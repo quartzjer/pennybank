@@ -14,7 +14,7 @@ exports.generate = function(N)
   {
     var p = pence.pence(N, ret.nonce);
     ret.secrets[p.ID.toString('hex')] = p;
-    ret.pence[p.ID.toString('hex')] = crypto.createHash('sha256').update(p.pN).digest('hex');
+    ret.pence[p.ID.toString('hex')] = p.pN.toString('hex');
   }
   
   return ret;
@@ -30,7 +30,7 @@ exports.verify = function(set, secrets)
     var id = p.ID.toString('hex');
     if(!set.pence[id]) return false;
     // the pN must also match
-    if(set.pence[id].toString('hex') != crypto.createHash('sha256').update(p.pN).digest('hex')) return false;
+    if(set.pence[id].toString('hex') != p.pN.toString('hex')) return false;
     delete set.pence[id];
   }
 

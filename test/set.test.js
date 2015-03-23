@@ -24,7 +24,7 @@ describe('set', function(){
     expect(ID).to.be.a('string');
     expect(ID.length).to.be.equal(40);
     expect(set.pence[ID]).to.be.a('string');
-    expect(set.pence[ID].length).to.be.equal(64);
+    expect(set.pence[ID].length).to.be.equal(10);
   });
 
   it('should verify a set', function(){
