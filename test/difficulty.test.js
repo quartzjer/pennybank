@@ -13,9 +13,9 @@ describe('difficulty', function(){
   });
 
   it('should generate a difficulty from fixed values', function(done){
-    libdifficulty.difficulty({hashestowin:'203702905701946867973',bcperblock:'25'}, function(err, hashes){
+    libdifficulty.difficulty({getdifficulty:'4.944639068824144E10',bcperblock:'2500000000'}, function(err, hashes){
       expect(err).to.not.exist();
-      expect(hashes.toString()).to.be.equal('8148116228077874718');
+      expect(hashes.toString()).to.be.equal('8494954859132248544');
       done();
     });
   });
