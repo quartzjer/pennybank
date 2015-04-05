@@ -20,7 +20,8 @@
     "bignum": "browserify-bignum"
   },
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "calculator": "browserify difficulty.js > browser_difficulty.js"
   },
   "repository": {
     "type": "git",

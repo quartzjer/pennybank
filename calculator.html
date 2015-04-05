@@ -1,0 +1,25 @@
+<html>
+<head>
+  <script src="browser_difficulty.js"></script>
+</head>
+<body>
+  <a href="https://blockchain.info/q/getdifficulty">current difficulty</a>: <span id="diff">loading...</span><br />
+  BTC: <input id="btc" size=8 value="0.01" /> <input type="button" onclick="calc()" value="calc" /><br />
+  pennies: <input id="pennies" size=8 value="0" /><br />
+  <script>
+  function calc()
+  {
+    var btc = window.bignum(document.getElementById("btc").value);
+    var hashes = btc2hash.mul(btc);
+    var pennies = Math.ceil(hashes.div(window.bignum(2).pow(40)).toString());
+    document.getElementById("pennies").value = pennies;
+  }
+  var btc2hash;
+  window.difficulty({}, function(err, hashes, diff){
+    console.log(hashes.toString());
+    btc2hash = hashes;
+    document.getElementById("diff").innerText = diff.toString();
+  });
+  </script>
+</body>
+</html>
