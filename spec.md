@@ -33,7 +33,7 @@ In order to perform micro-transactions two parties must first establish that a l
 <a name="p2cm" />
 ## Pay to Script Hash Conditional Multisig (P2CM)
 
-> A *Conditional Multisig* script is only accepted as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) in version [0.10 or later](https://github.com/bitcoin/bitcoin/blob/0.10/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses).
+> A *Conditional Multisig* script is only accepted as a [P2SH](https://en.bitcoin.it/wiki/Pay_to_script_hash) in version [0.10 or later](https://github.com/bitcoin/bitcoin/blob/v0.10.0/doc/release-notes.md#standard-script-rules-relaxed-for-p2sh-addresses).
 
 This template allows any two or more parties to create a multisig transaction that additionally requires some secret data from each party to be processed.
 
