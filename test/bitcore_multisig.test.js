@@ -32,7 +32,7 @@ describe('challenge', function(){
   
       var tx = new bitcore.Transaction()
         .from(utxo)
-        .to(P2SHFund.toAddress(), 10000)
+        .to(P2SHFund.toAddress(), 9000)
         .change(address)
         .sign(privateKey); 
 
@@ -42,8 +42,8 @@ describe('challenge', function(){
         console.log("funded to",id);
 
         var tx2 = new bitcore.Transaction()
-          .from({txId:id, outputIndex:0, inputIndex:0, satoshis:10000, script:P2SHFund.toString()}, [publicKey1, publicKey2], 1)
-          .to(address, 10000)
+          .from({txId:id, outputIndex:0, inputIndex:0, satoshis:9000, script:P2SHFund.toString()}, [publicKey1, publicKey2], 1)
+          .to(address, 8000)
           .sign(privateKey2); 
 
         console.log("tx2",tx2.serialize());

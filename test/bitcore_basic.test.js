@@ -50,7 +50,7 @@ var uxto = {
   script: P2SHFund,
   satoshis: 100000
 };
-var tx = new bitcore.Transaction().from(uxto,[publicKey1],1).to(P2SHFund.toAddress(), 100000).sign(privateKey1);
+var tx = new bitcore.Transaction().from(uxto,[publicKey1, publicKey2],1).to(P2SHFund.toAddress(), 100000).sign(privateKey1);
 //console.log(tx.inputs[0].getSignatures(tx, privateKey1, 0));
 var signature = tx.getSignatures(privateKey1)[0].signature.toBuffer();
 console.log(signature);
