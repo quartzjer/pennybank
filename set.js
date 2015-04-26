@@ -40,3 +40,9 @@ exports.verify = function(set, secrets)
   // all good
   return true;
 }
+
+// in browser
+if(typeof window !== "undefined")
+{
+  window.libset = exports;
+}

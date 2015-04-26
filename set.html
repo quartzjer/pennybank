@@ -1,0 +1,21 @@
+<html>
+<head>
+  <script src="browser_set.js"></script>
+</head>
+<body>
+  pennies: <input id="pennies" size=8 value="1000" /> <input type="button" onclick="generate()" value="generate" />
+  <span id="status"></span><br />
+  <textarea id="set" style="width:100%;height:100%"></textarea>
+  <script>
+  function generate()
+  {
+    var at = Date.now();
+    var pennies = document.getElementById("pennies").value;
+    var pset = window.libset.generate(pennies);
+    delete pset.secrets;
+    document.getElementById("set").value = JSON.stringify(pset,null,4);
+    document.getElementById("status").innerText = parseInt((Date.now() - at)/pennies)+" ms/penny";
+  }
+  </script>
+</body>
+</html>

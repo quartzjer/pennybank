@@ -29,13 +29,13 @@ exports.pence = function(N, nonce, p0){
   }
   
   var ret = {N:N, nonce:nonce, p0:p0, pN:pN, digest:digest};
-  ret.ID = crypto.createHash('ripemd160').update(digest).digest();
+  ret.ID = crypto.createHash('rmd160').update(digest).digest();
 //  console.log('PENCE',ret)
   return ret;
 };
 
 // handy debugging to run as command line
-if(process.argv[1].indexOf('pence.js') != -1)
+if(process && process.argv[1] && process.argv[1].indexOf('pence.js') != -1)
 {
   var satoshi = bignum(argv.btc * (100*1000000));
   if(!satoshi) return console.error('missing arg: --btc x');
